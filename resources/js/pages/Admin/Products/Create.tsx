@@ -140,8 +140,8 @@ export default function Create({ categories }: Props) {
                                     >
                                         <Star
                                             className={`w-8 h-8 ${star <= (data.rating as number)
-                                                    ? 'fill-yellow-400 text-yellow-400'
-                                                    : 'text-gray-300'
+                                                ? 'fill-yellow-400 text-yellow-400'
+                                                : 'text-gray-300'
                                                 }`}
                                         />
                                     </button>

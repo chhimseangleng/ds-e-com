@@ -30,7 +30,12 @@ class ProductController extends Controller
                     'image_path' => $product->image_path,
                 ];
             }),
-            'categories' => Product::distinct()->pluck('category')->filter()->values(),
+            'categories' => \App\Models\ProductCategory::all()->map(function ($category) {
+                return [
+                    'id' => $category->_id,
+                    'name' => $category->name,
+                ];
+            }),
             'currentCategory' => $request->query('category'),
         ]);
     }
@@ -56,7 +61,8 @@ class ProductController extends Controller
         $data = $request->only(['name', 'description', 'price', 'category', 'rating']);
 
         if ($request->hasFile('image')) {
-            $data['image_path'] = $request->file('image')->store('products', 'public');
+            $path = $request->file('image')->store('ecom/products', 's3');
+            $data['image_path'] = Storage::disk('s3')->url($path);
         }
 
         Product::create($data);
@@ -95,9 +101,12 @@ class ProductController extends Controller
 
         if ($request->hasFile('image')) {
             if ($product->image_path) {
-                Storage::disk('public')->delete($product->image_path);
+                // Extract path from URL if it's a full S3 URL
+                $oldPath = str_replace(Storage::disk('s3')->url(''), '', $product->image_path);
+                Storage::disk('s3')->delete($oldPath);
             }
-            $data['image_path'] = $request->file('image')->store('products', 'public');
+            $path = $request->file('image')->store('ecom/products', 's3');
+            $data['image_path'] = Storage::disk('s3')->url($path);
         }
 
         $product->update($data);
@@ -108,7 +117,9 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         if ($product->image_path) {
-            Storage::disk('public')->delete($product->image_path);
+            // Extract path from URL if it's a full S3 URL
+            $oldPath = str_replace(Storage::disk('s3')->url(''), '', $product->image_path);
+            Storage::disk('s3')->delete($oldPath);
         }
         $product->delete();
 
