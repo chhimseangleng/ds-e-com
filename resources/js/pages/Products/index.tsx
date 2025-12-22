@@ -78,7 +78,7 @@ export default function Index({ products, categories, currentCategory }: Props) 
                                                 <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
                                                     {product.image_path ? (
                                                         <img
-                                                            src={`/storage/${product.image_path}`}
+                                                            src={product.image_path}
                                                             alt={product.name}
                                                             className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                                                         />

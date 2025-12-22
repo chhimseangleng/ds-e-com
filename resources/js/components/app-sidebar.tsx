@@ -31,6 +31,11 @@ const mainNavItems: NavItem[] = [
         icon: Package,
     },
     {
+        title: 'Categories',
+        href: '/admin/product-categories',
+        icon: Tag,
+    },
+    {
         title: 'Events',
         href: '/admin/events',
         icon: Calendar,
@@ -63,7 +68,7 @@ const footerNavItems: NavItem[] = [
 export function AppSidebar() {
     const { categories = [], currentCategory = null } = usePage().props as any;
 
-    const allCategories = Array.from(new Set(['Drink', ...categories]));
+    // Just use categories from database, no hardcoded values to prevent duplicates
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -90,12 +95,12 @@ export function AppSidebar() {
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
-                            {allCategories.map((category: string) => (
-                                <SidebarMenuItem key={category}>
-                                    <SidebarMenuButton asChild isActive={currentCategory === category}>
-                                        <Link href={`/admin/products?category=${category}`}>
-                                            {category === 'Drink' ? <CupSoda className="w-4 h-4" /> : <Tag className="w-4 h-4" />}
-                                            <span>{category}</span>
+                            {categories.map((category: any) => (
+                                <SidebarMenuItem key={category.id}>
+                                    <SidebarMenuButton asChild isActive={currentCategory === category.name}>
+                                        <Link href={`/admin/products?category=${category.name}`}>
+                                            <Tag className="w-4 h-4" />
+                                            <span>{category.name}</span>
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>

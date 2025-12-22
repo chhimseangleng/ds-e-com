@@ -93,7 +93,7 @@ export default function Index({ products }: Props) {
                                             <div className="flex justify-center">
                                                 {product.image_path ? (
                                                     <img
-                                                        src={`/storage/${product.image_path}`}
+                                                        src={product.image_path}
                                                         alt={product.name}
                                                         className="w-12 h-12 object-cover rounded-md border border-gray-200"
                                                     />

@@ -60,7 +60,7 @@ export default function Edit({ product, categories }: Props) {
         image: null as File | null,
     });
 
-    const [preview, setPreview] = useState<string | null>(product.image_path ? `/storage/${product.image_path}` : null);
+    const [preview, setPreview] = useState<string | null>(product.image_path || null);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -153,8 +153,8 @@ export default function Edit({ product, categories }: Props) {
                                     >
                                         <Star
                                             className={`w-8 h-8 ${star <= (data.rating as number)
-                                                    ? 'fill-yellow-400 text-yellow-400'
-                                                    : 'text-gray-300'
+                                                ? 'fill-yellow-400 text-yellow-400'
+                                                : 'text-gray-300'
                                                 }`}
                                         />
                                     </button>

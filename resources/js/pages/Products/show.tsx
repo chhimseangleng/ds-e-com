@@ -3,7 +3,21 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Star, ShoppingCart } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 
-export default function Show({ product }) {
+interface Product {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    rating?: number;
+    category?: string;
+    image_path?: string;
+}
+
+interface Props {
+    product: Product;
+}
+
+export default function Show({ product }: Props) {
     return (
         <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto">
@@ -20,7 +34,7 @@ export default function Show({ product }) {
                         <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-100">
                             {product.image_path ? (
                                 <img
-                                    src={`/storage/${product.image_path}`}
+                                    src={product.image_path}
                                     alt={product.name}
                                     className="w-full h-full object-cover"
                                 />
@@ -42,8 +56,8 @@ export default function Show({ product }) {
                                         <Star
                                             key={star}
                                             className={`w-5 h-5 ${star <= (product.rating || 0)
-                                                    ? 'fill-yellow-400 text-yellow-400'
-                                                    : 'text-gray-300'
+                                                ? 'fill-yellow-400 text-yellow-400'
+                                                : 'text-gray-300'
                                                 }`}
                                         />
                                     ))}
