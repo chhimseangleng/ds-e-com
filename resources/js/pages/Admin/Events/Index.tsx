@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
 
 interface Event {
-    id: string; // Standardized to id
+    id: string;
     title: string;
     description: string;
-    date: string;
+    start_date: string;
+    end_date: string;
     location: string;
     image_path?: string;
 }
@@ -40,7 +41,7 @@ export default function Index({ events }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin - Events" />
 
-            <div className="p-6 md:p-10 max-w-7xl mx-auto">
+            <div className="p-6 md:p-10 max-w-none mx-auto">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                     <div className="space-y-1">
                         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Events</h1>
@@ -86,7 +87,7 @@ export default function Index({ events }: Props) {
                                                     <div className="w-14 h-14 rounded-2xl bg-gray-100 overflow-hidden border border-gray-100 group-hover:scale-110 transition-transform duration-300 shadow-sm">
                                                         {event.image_path ? (
                                                             <img
-                                                                src={`/storage/${event.image_path}`}
+                                                                src={event.image_path}
                                                                 alt={event.title}
                                                                 className="w-full h-full object-cover"
                                                             />
@@ -103,14 +104,27 @@ export default function Index({ events }: Props) {
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6">
-                                                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                                                    <Calendar className="w-4 h-4 text-blue-500" />
-                                                    {new Date(event.date).toLocaleDateString(undefined, {
-                                                        weekday: 'short',
-                                                        year: 'numeric',
-                                                        month: 'short',
-                                                        day: 'numeric'
-                                                    })}
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
+                                                        <span className="uppercase tracking-wider">Start:</span>
+                                                        <span className="text-gray-700">
+                                                            {new Date(event.start_date).toLocaleDateString(undefined, {
+                                                                month: 'short',
+                                                                day: 'numeric',
+                                                                year: 'numeric'
+                                                            })}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
+                                                        <span className="uppercase tracking-wider">End:</span>
+                                                        <span className="text-gray-700">
+                                                            {new Date(event.end_date).toLocaleDateString(undefined, {
+                                                                month: 'short',
+                                                                day: 'numeric',
+                                                                year: 'numeric'
+                                                            })}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6">

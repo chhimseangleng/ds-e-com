@@ -26,7 +26,8 @@ export default function Create() {
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
-        date: '',
+        start_date: '',
+        end_date: '',
         location: '',
         image: null as File | null,
     });
@@ -89,23 +90,41 @@ export default function Create() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                             <div className="space-y-4">
                                 <div className="space-y-1">
-                                    <Label htmlFor="date" className="text-base font-bold text-gray-900">Event Date</Label>
-                                    <p className="text-sm text-gray-500">When will it happen?</p>
+                                    <Label htmlFor="start_date" className="text-base font-bold text-gray-900">Start Date</Label>
+                                    <p className="text-sm text-gray-500">When does it start?</p>
                                 </div>
                                 <div className="flex items-center gap-3 bg-gray-50/50 rounded-2xl px-4 border border-gray-100 focus-within:border-blue-500 transition-colors">
                                     <Calendar className="w-5 h-5 text-gray-400" />
                                     <Input
-                                        id="date"
+                                        id="start_date"
                                         type="date"
-                                        value={data.date}
-                                        onChange={e => setData('date', e.target.value)}
+                                        value={data.start_date}
+                                        onChange={e => setData('start_date', e.target.value)}
                                         className="border-none bg-transparent h-14 focus-visible:ring-0"
                                     />
                                 </div>
-                                {errors.date && <p className="text-sm text-red-500 px-1">{errors.date}</p>}
+                                {errors.start_date && <p className="text-sm text-red-500 px-1">{errors.start_date}</p>}
                             </div>
 
                             <div className="space-y-4">
+                                <div className="space-y-1">
+                                    <Label htmlFor="end_date" className="text-base font-bold text-gray-900">End Date</Label>
+                                    <p className="text-sm text-gray-500">When does it end?</p>
+                                </div>
+                                <div className="flex items-center gap-3 bg-gray-50/50 rounded-2xl px-4 border border-gray-100 focus-within:border-blue-500 transition-colors">
+                                    <Calendar className="w-5 h-5 text-gray-400" />
+                                    <Input
+                                        id="end_date"
+                                        type="date"
+                                        value={data.end_date}
+                                        onChange={e => setData('end_date', e.target.value)}
+                                        className="border-none bg-transparent h-14 focus-visible:ring-0"
+                                    />
+                                </div>
+                                {errors.end_date && <p className="text-sm text-red-500 px-1">{errors.end_date}</p>}
+                            </div>
+
+                            <div className="md:col-span-2 space-y-4">
                                 <div className="space-y-1">
                                     <Label htmlFor="location" className="text-base font-bold text-gray-900">Location</Label>
                                     <p className="text-sm text-gray-500">Where is the venue?</p>

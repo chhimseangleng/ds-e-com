@@ -39,7 +39,7 @@ export default function AuthCardLayout({
                         </CardHeader>
                         <CardContent className="px-10 py-8">
                             {children}
-                        </CardContent>
+                        </CardContent>  
                     </Card>
                 </div>
             </div>

@@ -18,7 +18,8 @@ class EventController extends Controller
                     'id' => $event->_id,
                     'title' => $event->title,
                     'description' => $event->description,
-                    'date' => $event->date,
+                    'start_date' => $event->start_date,
+                    'end_date' => $event->end_date,
                     'location' => $event->location,
                     'image_path' => $event->image_path,
                 ];
@@ -36,12 +37,13 @@ class EventController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'date' => 'required|date',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
             'location' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->only(['title', 'description', 'date', 'location']);
+        $data = $request->only(['title', 'description', 'start_date', 'end_date', 'location']);
 
         if ($request->hasFile('image')) {
             $data['image_path'] = $request->file('image')->store('events', 'public');
@@ -59,7 +61,8 @@ class EventController extends Controller
                 'id' => $event->_id,
                 'title' => $event->title,
                 'description' => $event->description,
-                'date' => $event->date,
+                'start_date' => $event->start_date,
+                'end_date' => $event->end_date,
                 'location' => $event->location,
                 'image_path' => $event->image_path,
             ]
@@ -71,12 +74,13 @@ class EventController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'date' => 'required|date',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
             'location' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->only(['title', 'description', 'date', 'location']);
+        $data = $request->only(['title', 'description', 'start_date', 'end_date', 'location']);
 
         if ($request->hasFile('image')) {
             if ($event->image_path) {

@@ -27,14 +27,27 @@ import {
     Columns2,
     Calendar
 } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
-interface GuestSidebarProps {
-    categories: string[];
-    currentCategory: string;
+interface Category {
+    id: string;
+    name: string;
 }
 
-export function GuestSidebar({ categories, currentCategory }: GuestSidebarProps) {
+interface EventItem {
+    id: string;
+    title: string;
+}
+
+interface GuestSidebarProps {
+    categories?: string[] | Category[];
+    currentCategory?: string;
+}
+
+export function GuestSidebar({ categories: propsCategories, currentCategory = "" }: GuestSidebarProps) {
+    const { categories: sharedCategories = [], events_list = [] } = usePage().props as any;
+    const categories = (propsCategories && propsCategories.length > 0) ? propsCategories : sharedCategories;
+
     const iconMap: Record<string, any> = {
         'Electronics': Cpu,
         'Clothing': Shirt,
@@ -49,10 +62,13 @@ export function GuestSidebar({ categories, currentCategory }: GuestSidebarProps)
 
     const sideBarCategories = [
         { name: 'All Products', icon: Home },
-        ...categories.map(cat => ({
-            name: cat,
-            icon: iconMap[cat] || iconMap.default
-        }))
+        ...categories.map((cat: Category | string) => {
+            const name = typeof cat === 'string' ? cat : cat.name;
+            return {
+                name,
+                icon: iconMap[name] || iconMap.default
+            };
+        })
     ];
 
     const priceRanges = [
@@ -102,7 +118,11 @@ export function GuestSidebar({ categories, currentCategory }: GuestSidebarProps)
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="rounded-lg px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={usePage().url === '/events'}
+                                    className="rounded-lg px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-700 data-[active=true]:font-semibold"
+                                >
                                     <Link href="/events" className="w-full flex items-center">
                                         <Calendar className="w-4 h-4 mr-3" />
                                         <span>Events</span>
@@ -130,7 +150,7 @@ export function GuestSidebar({ categories, currentCategory }: GuestSidebarProps)
                                             className="rounded-lg px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-700 data-[active=true]:font-semibold"
                                         >
                                             <Link
-                                                href={`/?category=${category.name}`}
+                                                href={`/?category=${encodeURIComponent(category.name)}`}
                                                 className="w-full flex items-center"
                                             >
                                                 <category.icon className="w-4 h-4 mr-3" />
@@ -143,6 +163,37 @@ export function GuestSidebar({ categories, currentCategory }: GuestSidebarProps)
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
+
+                <SidebarSeparator className="my-2 mx-4 bg-gray-100" />
+
+                <SidebarGroup>
+                    <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 mb-2">
+                        Upcoming Events
+                    </SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu className="px-2">
+                            {events_list.map((event: any) => (
+                                <SidebarMenuItem key={event.id}>
+                                    <SidebarMenuButton
+                                        asChild
+                                        className="rounded-lg px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
+                                    >
+                                        <Link href="/events" className="w-full flex items-center">
+                                            <Calendar className="w-4 h-4 mr-3" />
+                                            <span>{event.title}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
+                            {events_list.length === 0 && (
+                                <div className="px-4 py-2 text-xs text-gray-400 italic">
+                                    No events scheduled
+                                </div>
+                            )}
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+
 
                 <SidebarSeparator className="my-2 mx-4 bg-gray-100" />
 

@@ -8,10 +8,11 @@ import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 
 interface Event {
-    id: string; // Standardized to id
+    id: string;
     title: string;
     description: string;
-    date: string;
+    start_date: string;
+    end_date: string;
     location: string;
     image_path?: string;
 }
@@ -36,19 +37,21 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Edit({ event }: Props) {
-    // Format date for the input (YYYY-MM-DD)
-    const formattedDate = event.date ? new Date(event.date).toISOString().split('T')[0] : '';
+    // Format dates for the input (YYYY-MM-DD)
+    const formattedStartDate = event.start_date ? new Date(event.start_date).toISOString().split('T')[0] : '';
+    const formattedEndDate = event.end_date ? new Date(event.end_date).toISOString().split('T')[0] : '';
 
     const { data, setData, post, processing, errors } = useForm({
         _method: 'PUT',
         title: event.title,
         description: event.description,
-        date: formattedDate,
+        start_date: formattedStartDate,
+        end_date: formattedEndDate,
         location: event.location,
         image: null as File | null,
     });
 
-    const [preview, setPreview] = useState<string | null>(event.image_path ? `/storage/${event.image_path}` : null);
+    const [preview, setPreview] = useState<string | null>(event.image_path ? event.image_path : null);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -68,7 +71,7 @@ export default function Edit({ event }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Admin - Edit ${event.title}`} />
 
-            <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-10">
+            <div className="p-6 md:p-10 max-w-screen-2xl mx-auto space-y-10">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="space-y-1">
                         <Button variant="ghost" asChild className="-ml-3 h-8 text-gray-500 hover:text-blue-600">
@@ -107,23 +110,41 @@ export default function Edit({ event }: Props) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                             <div className="space-y-4">
                                 <div className="space-y-1">
-                                    <Label htmlFor="date" className="text-base font-bold text-gray-900">Event Date</Label>
-                                    <p className="text-sm text-gray-500">Change the scheduled date?</p>
+                                    <Label htmlFor="start_date" className="text-base font-bold text-gray-900">Start Date</Label>
+                                    <p className="text-sm text-gray-500">Change the scheduled start date?</p>
                                 </div>
                                 <div className="flex items-center gap-3 bg-gray-50/50 rounded-2xl px-4 border border-gray-100 focus-within:border-blue-500 transition-colors">
                                     <Calendar className="w-5 h-5 text-gray-400" />
                                     <Input
-                                        id="date"
+                                        id="start_date"
                                         type="date"
-                                        value={data.date}
-                                        onChange={e => setData('date', e.target.value)}
+                                        value={data.start_date}
+                                        onChange={e => setData('start_date', e.target.value)}
                                         className="border-none bg-transparent h-14 focus-visible:ring-0"
                                     />
                                 </div>
-                                {errors.date && <p className="text-sm text-red-500 px-1">{errors.date}</p>}
+                                {errors.start_date && <p className="text-sm text-red-500 px-1">{errors.start_date}</p>}
                             </div>
 
                             <div className="space-y-4">
+                                <div className="space-y-1">
+                                    <Label htmlFor="end_date" className="text-base font-bold text-gray-900">End Date</Label>
+                                    <p className="text-sm text-gray-500">Change the scheduled end date?</p>
+                                </div>
+                                <div className="flex items-center gap-3 bg-gray-50/50 rounded-2xl px-4 border border-gray-100 focus-within:border-blue-500 transition-colors">
+                                    <Calendar className="w-5 h-5 text-gray-400" />
+                                    <Input
+                                        id="end_date"
+                                        type="date"
+                                        value={data.end_date}
+                                        onChange={e => setData('end_date', e.target.value)}
+                                        className="border-none bg-transparent h-14 focus-visible:ring-0"
+                                    />
+                                </div>
+                                {errors.end_date && <p className="text-sm text-red-500 px-1">{errors.end_date}</p>}
+                            </div>
+
+                            <div className="md:col-span-2 space-y-4">
                                 <div className="space-y-1">
                                     <Label htmlFor="location" className="text-base font-bold text-gray-900">Location</Label>
                                     <p className="text-sm text-gray-500">Update the venue location.</p>
