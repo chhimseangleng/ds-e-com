@@ -41,7 +41,7 @@ export default function Index({ products }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin - Products" />
 
-            <div className="p-6">
+            <div className="p-6 md:p-10 w-full space-y-10">
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">Products</h1>

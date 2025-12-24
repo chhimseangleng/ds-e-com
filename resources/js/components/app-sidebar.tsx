@@ -41,11 +41,6 @@ const mainNavItems: NavItem[] = [
         icon: Calendar,
     },
     {
-        title: 'Orders',
-        href: '/admin/orders',
-        icon: ShoppingCart,
-    },
-    {
         title: 'Users',
         href: '/admin/users',
         icon: Users,
@@ -53,20 +48,11 @@ const mainNavItems: NavItem[] = [
 ];
 
 const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
+
 ];
 
 export function AppSidebar() {
-    const { categories = [], currentCategory = null } = usePage().props as any;
+    const { categories = [], events_list = [], currentCategory = null } = usePage().props as any;
 
     // Just use categories from database, no hardcoded values to prevent duplicates
 
@@ -74,7 +60,7 @@ export function AppSidebar() {
         <Sidebar collapsible="icon" variant="inset">
             {/* Header with logo */}
             <SidebarHeader className="flex flex-col items-center py-4">
-                <Link href={dashboard()} prefetch>
+                <Link href={dashboard().url} prefetch>
                     <AppLogo />
                 </Link>
             </SidebarHeader>
@@ -88,7 +74,7 @@ export function AppSidebar() {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild isActive={!currentCategory}>
+                                <SidebarMenuButton asChild isActive={usePage().url === '/admin/products' && (!currentCategory || currentCategory === 'All Products')}>
                                     <Link href="/admin/products">
                                         <Package className="w-4 h-4" />
                                         <span>All Products</span>
@@ -97,10 +83,41 @@ export function AppSidebar() {
                             </SidebarMenuItem>
                             {categories.map((category: any) => (
                                 <SidebarMenuItem key={category.id}>
-                                    <SidebarMenuButton asChild isActive={currentCategory === category.name}>
-                                        <Link href={`/admin/products?category=${category.name}`}>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={currentCategory === category.name}
+                                    >
+                                        <Link href={`/admin/products?category=${encodeURIComponent(category.name)}`}>
                                             <Tag className="w-4 h-4" />
                                             <span>{category.name}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Dynamic Events</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild isActive={usePage().url === '/admin/events'}>
+                                    <Link href="/admin/events">
+                                        <Calendar className="w-4 h-4" />
+                                        <span>All Events</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            {events_list.map((event: any) => (
+                                <SidebarMenuItem key={event.id}>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={usePage().url === `/admin/events/${event.id}/edit`}
+                                    >
+                                        <Link href={`/admin/events/${event.id}/edit`}>
+                                            <Calendar className="w-4 h-4" />
+                                            <span>{event.title}</span>
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>

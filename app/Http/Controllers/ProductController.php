@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Event;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 
 class ProductController extends Controller
@@ -28,11 +30,26 @@ class ProductController extends Controller
                 'image_path' => $product->image_path,
             ];
         });
-        $categories = \App\Models\ProductCategory::all()->pluck('name')->filter()->values()->toArray();
+
+
+        $today = Carbon::today()->format('Y-m-d');
+        $events = Event::where('start_date', '<=', $today)
+            ->where('end_date', '>=', $today)
+            ->get()
+            ->map(function ($event) {
+                return [
+                    'id' => $event->_id,
+                    'title' => $event->title,
+                    'description' => $event->description,
+                    'image_path' => $event->image_path,
+                    'start_date' => $event->start_date,
+                    'end_date' => $event->end_date,
+                ];
+            });
 
         return Inertia::render('Products/index', [
             'products' => $products,
-            'categories' => $categories,
+            'events' => $events,
             'currentCategory' => $request->query('category', 'All Products'),
         ]);
     }

@@ -24,6 +24,7 @@ class DashboardController extends Controller
                         'price' => $product->price,
                         'category' => $product->category,
                         'image_path' => $product->image_path,
+                        'created_at' => $product->created_at ? $product->created_at->toDateTimeString() : null,
                     ];
                 }),
             ]

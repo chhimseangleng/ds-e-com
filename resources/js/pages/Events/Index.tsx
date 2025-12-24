@@ -15,7 +15,8 @@ interface Event {
     id: string;
     title: string;
     description: string;
-    date: string;
+    start_date: string;
+    end_date: string;
     location: string;
     image_path?: string;
 }
@@ -32,12 +33,12 @@ export default function Index({ events }: Props) {
     return (
         <SidebarProvider>
             <div className="flex min-h-screen w-full bg-gray-50/50">
-                <GuestSidebar categories={[]} currentCategory="" />
+                <GuestSidebar currentCategory="" />
 
                 <SidebarInset className="bg-transparent flex-1">
                     <Head title="Events - Store" />
 
-                    <div className="p-6 md:p-12 max-w-7xl mx-auto space-y-12">
+                    <div className="p-6 md:p-12 max-w-screen-2xl mx-auto space-y-12">
                         {/* Hero Header */}
                         <div className="relative overflow-hidden bg-white/40 backdrop-blur-xl rounded-[3rem] p-12 border border-white/60 shadow-sm">
                             <div className="relative z-10 max-w-2xl space-y-4">
@@ -78,15 +79,16 @@ export default function Index({ events }: Props) {
                                 </div>
                             ) : (
                                 events.map((event) => (
-                                    <div
+                                    <Link
                                         key={event.id}
+                                        href={`/events/${event.id}`}
                                         className="group bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-500 flex flex-col h-full hover:-translate-y-2"
                                     >
                                         {/* Image Header */}
                                         <div className="relative aspect-video overflow-hidden">
                                             {event.image_path ? (
                                                 <img
-                                                    src={`/storage/${event.image_path}`}
+                                                    src={event.image_path}
                                                     alt={event.title}
                                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                                 />
@@ -98,10 +100,10 @@ export default function Index({ events }: Props) {
                                             <div className="absolute top-4 right-4 group-hover:scale-110 transition-transform duration-500">
                                                 <div className="bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-xl flex flex-col items-center min-w-[60px]">
                                                     <span className="text-[0.6rem] font-bold text-blue-600 uppercase tracking-tighter">
-                                                        {new Date(event.date).toLocaleDateString(undefined, { month: 'short' })}
+                                                        {new Date(event.start_date).toLocaleDateString(undefined, { month: 'short' })}
                                                     </span>
                                                     <span className="text-2xl font-black text-gray-900 leading-none">
-                                                        {new Date(event.date).toLocaleDateString(undefined, { day: 'numeric' })}
+                                                        {new Date(event.start_date).toLocaleDateString(undefined, { day: 'numeric' })}
                                                     </span>
                                                 </div>
                                             </div>
@@ -112,12 +114,12 @@ export default function Index({ events }: Props) {
                                             <div className="space-y-3">
                                                 <div className="flex flex-wrap gap-2">
                                                     <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-50 text-gray-500 rounded-full text-xs font-bold border border-gray-100 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-100 transition-colors">
-                                                        <Clock className="w-3.5 h-3.5" />
-                                                        <span>10:00 AM</span>
+                                                        <Calendar className="w-3.5 h-3.5" />
+                                                        <span>Ends {new Date(event.end_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                                                     </div>
                                                     <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-50 text-gray-500 rounded-full text-xs font-bold border border-gray-100 group-hover:bg-red-50 group-hover:text-red-500 group-hover:border-red-100 transition-colors">
                                                         <MapPin className="w-3.5 h-3.5" />
-                                                        <span>Live Session</span>
+                                                        <span className="truncate max-w-[100px]">{event.location}</span>
                                                     </div>
                                                 </div>
                                                 <h3 className="text-2xl font-black text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
@@ -131,10 +133,10 @@ export default function Index({ events }: Props) {
                                             <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white ring-4 ring-blue-50">
-                                                        <MapPin className="w-4 h-4" />
+                                                        <Calendar className="w-4 h-4" />
                                                     </div>
-                                                    <span className="text-sm font-bold text-gray-700 truncate max-w-[120px]">
-                                                        {event.location}
+                                                    <span className="text-sm font-bold text-gray-700">
+                                                        View Details
                                                     </span>
                                                 </div>
                                                 <Button variant="ghost" className="rounded-xl group/btn hover:bg-blue-50 p-0 w-10 h-10 flex items-center justify-center">
@@ -142,7 +144,7 @@ export default function Index({ events }: Props) {
                                                 </Button>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 ))
                             )}
                         </div>

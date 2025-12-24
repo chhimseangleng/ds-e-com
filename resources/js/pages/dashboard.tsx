@@ -45,7 +45,7 @@ export default function Dashboard({ stats }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin Dashboard" />
 
-            <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10">
+            <div className="p-6 md:p-10 w-full space-y-10">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div className="space-y-1">
@@ -168,7 +168,7 @@ export default function Dashboard({ stats }: Props) {
                                                     <div className="w-10 h-10 rounded-xl bg-gray-100 overflow-hidden border border-gray-100 group-hover:scale-110 transition-transform duration-300">
                                                         {product.image_path ? (
                                                             <img
-                                                                src={`/storage/${product.image_path}`}
+                                                                src={product.image_path}
                                                                 alt={product.name}
                                                                 className="w-full h-full object-cover"
                                                             />

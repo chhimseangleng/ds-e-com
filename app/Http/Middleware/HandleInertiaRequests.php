@@ -46,6 +46,18 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'categories' => \App\Models\ProductCategory::all()->map(function ($category) {
+                return [
+                    'id' => $category->_id,
+                    'name' => $category->name,
+                ];
+            }),
+            'events_list' => \App\Models\Event::all()->map(function ($event) {
+                return [
+                    'id' => $event->_id,
+                    'title' => $event->title,
+                ];
+            }),
         ];
     }
 }

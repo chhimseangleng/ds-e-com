@@ -3,8 +3,12 @@ import { Link } from '@inertiajs/react';
 import {
     ShoppingCart,
     Search,
-    Star
+    Star,
+    ChevronLeft,
+    ChevronRight,
+    Calendar
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import {
     SidebarInset,
     SidebarProvider,
@@ -25,13 +29,38 @@ interface Product {
     image_path?: string;
 }
 
+interface Category {
+    id: string;
+    name: string;
+}
+
+interface Event {
+    id: string;
+    title: string;
+    description: string;
+    image_path?: string;
+    start_date: string;
+    end_date: string;
+}
+
 interface Props {
     products: Product[];
-    categories: string[];
+    categories: Category[];
+    events: Event[];
     currentCategory: string;
 }
 
-export default function Index({ products, categories, currentCategory }: Props) {
+export default function Index({ products, categories, events, currentCategory }: Props) {
+    const [currentEventIndex, setCurrentEventIndex] = useState(0);
+
+    useEffect(() => {
+        if (events.length <= 1) return;
+        const interval = setInterval(() => {
+            setCurrentEventIndex((prev) => (prev + 1) % events.length);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [events]);
+
     const groupedProducts = products.reduce((acc, product) => {
         const category = product.category || 'Uncategorized';
         if (!acc[category]) {
@@ -57,6 +86,81 @@ export default function Index({ products, categories, currentCategory }: Props) 
 
                     {/* Main Content */}
                     <main className="flex-1 p-6 md:p-8 pt-6">
+                        {/* Events Banner/Carousel */}
+                        {events && events.length > 0 && (
+                            <div className="mb-12 relative group h-[300px] md:h-[450px] overflow-hidden rounded-[2.5rem] shadow-2xl border border-white/20">
+                                {events.map((event, index) => (
+                                    <div
+                                        key={event.id}
+                                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentEventIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                                            }`}
+                                    >
+                                        <Link href={`/events/${event.id}`} className="block h-full w-full">
+                                            {/* Background Image */}
+                                            <div className="absolute inset-0">
+                                                {event.image_path ? (
+                                                    <img
+                                                        src={event.image_path}
+                                                        alt={event.title}
+                                                        className="w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-[10s]"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-900" />
+                                                )}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                                            </div>
+
+                                            {/* Content */}
+                                            <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-16 space-y-4">
+                                                <div className="flex items-center gap-2">
+                                                    <Badge className="bg-blue-600/90 text-white border-none px-3 py-1 text-xs font-bold tracking-wider uppercase animate-bounce">
+                                                        Limited Time Event
+                                                    </Badge>
+                                                    <span className="text-white/70 text-sm font-medium flex items-center gap-1.5 glass-effect px-3 py-1 rounded-full">
+                                                        <Calendar className="w-3.5 h-3.5" />
+                                                        Ends {new Date(event.end_date).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                                <h1 className="text-4xl md:text-6xl font-black text-white leading-tight max-w-2xl drop-shadow-2xl">
+                                                    {event.title}
+                                                </h1>
+                                                <p className="text-lg md:text-xl text-white/80 max-w-xl line-clamp-2 leading-relaxed font-medium">
+                                                    {event.description}
+                                                </p>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                ))}
+
+                                {/* Carousel Controls */}
+                                {events.length > 1 && (
+                                    <>
+                                        <button
+                                            onClick={() => setCurrentEventIndex((prev) => (prev - 1 + events.length) % events.length)}
+                                            className="absolute left-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white transition-all opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100"
+                                        >
+                                            <ChevronLeft className="w-6 h-6" />
+                                        </button>
+                                        <button
+                                            onClick={() => setCurrentEventIndex((prev) => (prev + 1) % events.length)}
+                                            className="absolute right-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white transition-all opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100"
+                                        >
+                                            <ChevronRight className="w-6 h-6" />
+                                        </button>
+                                        <div className="absolute bottom-10 right-10 z-20 flex gap-2">
+                                            {events.map((_, i) => (
+                                                <div
+                                                    key={i}
+                                                    className={`h-2 transition-all duration-300 rounded-full ${i === currentEventIndex ? 'w-8 bg-blue-500' : 'w-2 bg-white/30'
+                                                        }`}
+                                                />
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        )}
+
                         <div className="space-y-12">
                             {Object.entries(groupedProducts).map(([category, items]) => (
                                 <div key={category} className="space-y-6">
