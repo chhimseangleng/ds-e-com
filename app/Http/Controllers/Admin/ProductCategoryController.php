@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ProductCategoryController extends Controller
 {
     public function index()
     {
-        return \Inertia\Inertia::render('Admin/ProductCategories/Index', [
+        // dd(ProductCategory::all());
+        return Inertia::render('Admin/ProductCategories/Index', [
             'categories' => ProductCategory::all()
         ]);
     }
@@ -25,7 +27,7 @@ class ProductCategoryController extends Controller
             'name' => $request->name,
         ]);
 
-        return redirect()->back()->with('success', 'Category created successfully.');
+        return redirect()->route('product-categories.index')->with('success', 'Category created successfully.');
     }
 
     public function update(Request $request, $id)
@@ -41,7 +43,7 @@ class ProductCategoryController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Category updated successfully.');
+        return redirect()->route('product-categories.index')->with('success', 'Category updated successfully.');
     }
 
     public function destroy($id)
@@ -50,6 +52,6 @@ class ProductCategoryController extends Controller
         if ($category) {
             $category->delete();
         }
-        return redirect()->back()->with('success', 'Category deleted successfully.');
+        return redirect()->route('product-categories.index')->with('success', 'Category deleted successfully.');
     }
 }
