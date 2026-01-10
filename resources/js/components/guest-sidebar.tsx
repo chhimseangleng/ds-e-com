@@ -34,30 +34,35 @@ interface Category {
     name: string;
 }
 
-interface EventItem {
-    id: string;
-    title: string;
-}
-
 interface GuestSidebarProps {
     categories?: string[] | Category[];
     currentCategory?: string;
 }
 
-export function GuestSidebar({ categories: propsCategories, currentCategory = "" }: GuestSidebarProps) {
-    const { categories: sharedCategories = [], events_list = [] } = usePage().props as any;
-    const categories = (propsCategories && propsCategories.length > 0) ? propsCategories : sharedCategories;
+export function GuestSidebar({
+    categories: propsCategories,
+    currentCategory = "",
+}: GuestSidebarProps) {
+
+    // ✅ USE usePage INSIDE COMPONENT
+    const { auth, categories: sharedCategories = [], events_list = [] } = usePage().props as any;
+    const user = auth?.user;
+
+    const categories =
+        propsCategories && propsCategories.length > 0
+            ? propsCategories
+            : sharedCategories;
 
     const iconMap: Record<string, any> = {
-        'Electronics': Cpu,
-        'Clothing': Shirt,
-        'Books': Book,
-        'Accessories': Glasses,
-        'Drink': CupSoda,
-        'Food': UtensilsCrossed,
-        'Table': Columns2,
-        'Chair': Armchair,
-        'default': Package
+        Electronics: Cpu,
+        Clothing: Shirt,
+        Books: Book,
+        Accessories: Glasses,
+        Drink: CupSoda,
+        Food: UtensilsCrossed,
+        Table: Columns2,
+        Chair: Armchair,
+        default: Package,
     };
 
     const sideBarCategories = [
@@ -66,9 +71,9 @@ export function GuestSidebar({ categories: propsCategories, currentCategory = ""
             const name = typeof cat === 'string' ? cat : cat.name;
             return {
                 name,
-                icon: iconMap[name] || iconMap.default
+                icon: iconMap[name] || iconMap.default,
             };
-        })
+        }),
     ];
 
     const priceRanges = [
@@ -92,6 +97,7 @@ export function GuestSidebar({ categories: propsCategories, currentCategory = ""
                     </Link>
                 </div>
             </SidebarHeader>
+
             <SidebarContent>
                 <div className="px-4 py-2">
                     <div className="relative">
@@ -103,6 +109,7 @@ export function GuestSidebar({ categories: propsCategories, currentCategory = ""
                     </div>
                 </div>
 
+                {/* NAVIGATION */}
                 <SidebarGroup>
                     <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 mb-2">
                         Navigation
@@ -110,22 +117,19 @@ export function GuestSidebar({ categories: propsCategories, currentCategory = ""
                     <SidebarGroupContent>
                         <SidebarMenu className="px-2">
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="rounded-lg px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
-                                    <Link href="/" className="w-full flex items-center">
+                                <SidebarMenuButton asChild>
+                                    <Link href="/" className="flex items-center">
                                         <Home className="w-4 h-4 mr-3" />
-                                        <span>Home</span>
+                                        Home
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
+
                             <SidebarMenuItem>
-                                <SidebarMenuButton
-                                    asChild
-                                    isActive={usePage().url === '/events'}
-                                    className="rounded-lg px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-700 data-[active=true]:font-semibold"
-                                >
-                                    <Link href="/events" className="w-full flex items-center">
+                                <SidebarMenuButton asChild isActive={usePage().url === '/events'}>
+                                    <Link href="/events" className="flex items-center">
                                         <Calendar className="w-4 h-4 mr-3" />
-                                        <span>Events</span>
+                                        Events
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -133,103 +137,56 @@ export function GuestSidebar({ categories: propsCategories, currentCategory = ""
                     </SidebarGroupContent>
                 </SidebarGroup>
 
-                <SidebarSeparator className="my-2 mx-4 bg-gray-100" />
+                <SidebarSeparator className="my-2 mx-4" />
 
+                {/* CATEGORIES */}
                 <SidebarGroup>
                     <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 mb-2">
                         Categories
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu className="px-2">
-                            {sideBarCategories.map((category) => (
-                                category.name !== 'All Products' && (
+                            {sideBarCategories
+                                .filter(c => c.name !== 'All Products')
+                                .map(category => (
                                     <SidebarMenuItem key={category.name}>
                                         <SidebarMenuButton
                                             asChild
                                             isActive={category.name === currentCategory}
-                                            className="rounded-lg px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-700 data-[active=true]:font-semibold"
                                         >
                                             <Link
                                                 href={`/?category=${encodeURIComponent(category.name)}`}
-                                                className="w-full flex items-center"
+                                                className="flex items-center"
                                             >
                                                 <category.icon className="w-4 h-4 mr-3" />
-                                                <span>{category.name}</span>
+                                                {category.name}
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
-                                )
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-
-                <SidebarSeparator className="my-2 mx-4 bg-gray-100" />
-
-                <SidebarGroup>
-                    <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 mb-2">
-                        Upcoming Events
-                    </SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu className="px-2">
-                            {events_list.map((event: any) => (
-                                <SidebarMenuItem key={event.id}>
-                                    <SidebarMenuButton
-                                        asChild
-                                        className="rounded-lg px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
-                                    >
-                                        <Link href="/events" className="w-full flex items-center">
-                                            <Calendar className="w-4 h-4 mr-3" />
-                                            <span>{event.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                            {events_list.length === 0 && (
-                                <div className="px-4 py-2 text-xs text-gray-400 italic">
-                                    No events scheduled
-                                </div>
-                            )}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-
-
-                <SidebarSeparator className="my-2 mx-4 bg-gray-100" />
-
-                <SidebarGroup>
-                    <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 mb-2">
-                        Price Range
-                    </SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu className="px-2 space-y-1">
-                            {priceRanges.map((range) => (
-                                <SidebarMenuItem key={range}>
-                                    <SidebarMenuButton className="rounded-lg px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
-                                        <div className="flex items-center w-full">
-                                            <div className="w-4 h-4 rounded border border-gray-300 mr-3 mt-0.5" />
-                                            <span>{range}</span>
-                                        </div>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
+                                ))}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
 
-            <SidebarFooter className="p-4 border-t border-gray-100">
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild className="w-full justify-center bg-gray-900 text-white hover:bg-gray-800 hover:text-white transition-colors shadow-md">
-                            <Link href="/dashboard" className="flex items-center gap-2">
-                                <LayoutDashboard className="w-4 h-4" />
-                                <span>Go to Admin</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarFooter>
+            {/* ✅ ADMIN BUTTON — AUTH CHECK HERE */}
+            {user && (
+                <SidebarFooter className="p-4 border-t border-gray-100">
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                asChild
+                                className="w-full justify-center bg-gray-900 text-white hover:bg-gray-800"
+                            >
+                                <Link href="/dashboard" className="flex items-center gap-2">
+                                    <LayoutDashboard className="w-4 h-4" />
+                                    Go to Admin
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarFooter>
+            )}
         </Sidebar>
     );
 }
