@@ -12,7 +12,7 @@ class EventController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin.Events.Index', [
+        return Inertia::render('Admin/Events/Index', [
             'events' => Event::all()->map(function ($event) {
                 return [
                     'id' => $event->_id,
@@ -29,7 +29,7 @@ class EventController extends Controller
 
     public function create()
     {
-        return Inertia::render('Admin.Events.Create');
+        return Inertia::render('Admin/Events/Create');
     }
 
     public function store(Request $request)
@@ -43,20 +43,29 @@ class EventController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->only(['title', 'description', 'start_date', 'end_date', 'location']);
+        $data = $request->only([
+            'title',
+            'description',
+            'start_date',
+            'end_date',
+            'location'
+        ]);
 
         if ($request->hasFile('image')) {
-            $data['image_path'] = $request->file('image')->store('events', 'public');
+            $path = $request->file('image')->store('events', 's3');
+            $data['image_path'] = Storage::disk('s3')->url($path);
         }
 
         Event::create($data);
 
-        return redirect()->route('admin.events.index')->with('success', 'Event created successfully.');
+        return redirect()
+            ->route('admin.events.index')
+            ->with('success', 'Event created successfully.');
     }
 
     public function edit(Event $event)
     {
-        return Inertia::render('Admin.Events.Edit', [
+        return Inertia::render('Admin/Events/Edit', [
             'event' => [
                 'id' => $event->_id,
                 'title' => $event->title,
@@ -80,18 +89,36 @@ class EventController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->only(['title', 'description', 'start_date', 'end_date', 'location']);
+        $data = $request->only([
+            'title',
+            'description',
+            'start_date',
+            'end_date',
+            'location'
+        ]);
 
         if ($request->hasFile('image')) {
+
+            // 🔴 Delete old image from S3
             if ($event->image_path) {
-                Storage::disk('public')->delete($event->image_path);
+                $path = parse_url($event->image_path, PHP_URL_PATH);
+                $oldPath = ltrim($path, '/');
+
+                if ($oldPath && Storage::disk('s3')->exists($oldPath)) {
+                    Storage::disk('s3')->delete($oldPath);
+                }
             }
-            $data['image_path'] = $request->file('image')->store('events', 'public');
+
+            // 🟢 Upload new image to S3
+            $path = $request->file('image')->store('events', 's3');
+            $data['image_path'] = Storage::disk('s3')->url($path);
         }
 
         $event->update($data);
 
-        return redirect()->route('admin.events.index')->with('success', 'Event updated successfully.');
+        return redirect()
+            ->route('admin.events.index')
+            ->with('success', 'Event updated successfully.');
     }
 
     public function destroy(Event $event)
